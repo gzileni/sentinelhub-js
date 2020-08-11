@@ -1,7 +1,7 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { ApiType, CacheTarget, Interpolator, S2L2ALayer, setAuthToken, MosaickingOrder } from '../../index';
+import { ApiType, Interpolator, S2L2ALayer, setAuthToken, MosaickingOrder } from '../../index';
 import { ProcessingPayload, ProcessingPayloadDatasource } from '../processing';
 
 import '../../../jest-setup';
