@@ -7,6 +7,7 @@ import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
+import { Interpolator } from '..';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -15,6 +16,8 @@ interface ConstructorParameters {
   evalscriptUrl?: string | null;
   dataProduct?: DataProductId | null;
   mosaickingOrder?: MosaickingOrder | null;
+  upsampling?: Interpolator | null;
+  downsampling?: Interpolator | null;
   title?: string | null;
   description?: string | null;
   legendUrl?: string | null;
