@@ -1,7 +1,7 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { ApiType, MosaickingOrder, S2L2ALayer, setAuthToken } from '../../index';
+import { ApiType, Interpolator, MosaickingOrder, S2L2ALayer, setAuthToken } from '../../index';
 import { ProcessingPayload, ProcessingPayloadDatasource } from '../processing';
 
 import '../../../jest-setup';
@@ -95,4 +95,43 @@ test('Mosaicking order is set from instance/layer in dashboard processing', asyn
   expect(mockNetwork.history.post.length).toBe(2);
   expect(dataFilter.mosaickingOrder).toBe(MosaickingOrder.LEAST_RECENT);
   expect(layerS2L2A.mosaickingOrder).toBe(MosaickingOrder.LEAST_RECENT);
+});
+
+test('MosaickingOrder should not be overriden by layer default value if set in constructor', async () => {
+  const layerS2L2A = new S2L2ALayer({
+    instanceId: 'INSTANCE_ID',
+    layerId: 'LAYER_ID',
+    mosaickingOrder: MosaickingOrder.LEAST_RECENT,
+  });
+
+  const { getMapParams, mockedLayersResponse } = constructFixtureMosaickingOrder();
+
+  const mockNetwork = new MockAdapter(axios);
+  mockNetwork.reset();
+  mockNetwork.onGet().reply(200, mockedLayersResponse);
+  mockNetwork.onPost().reply(200);
+  setAuthToken('Token');
+
+  //initialy MosaickingOrder is set, upsampling is null
+  expect(layerS2L2A.mosaickingOrder).toBe(MosaickingOrder.LEAST_RECENT);
+  expect(layerS2L2A.upsampling).toBeNull();
+
+  await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING, {
+    cache: {
+      expiresIn: 0,
+    },
+  });
+  expect(mockNetwork.history.post.length).toBe(1);
+
+  const dataFilter = extractDataFilterFromPayload(JSON.parse(mockNetwork.history.post[0].data));
+  const { processing } = JSON.parse(mockNetwork.history.post[0].data).input.data[0];
+  console.log('processing', processing);
+
+  //MosaickingOrder is not overriden by default values from service
+  expect(dataFilter.mosaickingOrder).toBe(MosaickingOrder.LEAST_RECENT);
+  expect(layerS2L2A.mosaickingOrder).toBe(MosaickingOrder.LEAST_RECENT);
+
+  //upsampling is set from default values from service
+  expect(processing.upsampling).toBe(Interpolator.BICUBIC);
+  expect(layerS2L2A.upsampling).toBe(Interpolator.BICUBIC);
 });
