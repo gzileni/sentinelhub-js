@@ -8,7 +8,7 @@
     "@turf/area": "^6.0.1",
     "@turf/helpers": "^6.1.4",
     "@types/xml2js": "^0.4.4",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "moment": "^2.24.0",
     "polygon-clipping": "^0.14.3",
     "query-string": "^6.4.2",
